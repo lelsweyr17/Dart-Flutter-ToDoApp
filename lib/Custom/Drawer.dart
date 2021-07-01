@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:list_view/MainPage/MainPage.dart';
+import 'package:list_view/ToDoPage/ToDoPage.dart';
 import 'package:list_view/ThemeData.dart';
+import 'package:list_view/Archive.dart';
+import 'package:list_view/Trash.dart';
 import 'package:list_view/globals.dart' as globals;
 
 class CustomDrawer extends StatefulWidget {
   const CustomDrawer({Key? key}) : super(key: key);
-
   @override
   _CustomDrawerState createState() => _CustomDrawerState();
 }
@@ -14,7 +17,6 @@ class _CustomDrawerState extends State<CustomDrawer> {
   @override
   Widget build(BuildContext context) {
     ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
-
     return Drawer(
       child: ListView(
         children: <Widget>[
@@ -43,32 +45,33 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               color: Theme.of(context).accentColor))),
                 ],
               ),
-              padding: const EdgeInsets.only(right: 10.0, left: 20.0, top: 10.0)),
-           ListTile(
+              padding:
+                  const EdgeInsets.only(right: 10.0, left: 20.0, top: 10.0)),
+          ListTile(
             contentPadding: EdgeInsets.only(right: 18.0, left: 20.0),
-            trailing: Icon(Icons.home_outlined,
-                color: Theme.of(context).accentColor),
+            trailing:
+                Icon(Icons.home_outlined, color: Theme.of(context).accentColor),
             title: Text('Main'),
             onTap: () {
-              Navigator.pushNamed(context, '/');
+              Navigator.of(context).push(routeMainPage());
             },
-          ),    
-           ListTile(
+          ),
+          ListTile(
             contentPadding: EdgeInsets.only(right: 18.0, left: 20.0),
-            trailing: Icon(Icons.home_outlined,
-                color: Theme.of(context).accentColor),
+            trailing:
+                Icon(Icons.home_outlined, color: Theme.of(context).accentColor),
             title: Text('List'),
             onTap: () {
-              Navigator.pushNamed(context, '/homepage');
+              Navigator.of(context).push(routeToDoPage());
             },
-          ),    
+          ),
           ListTile(
             contentPadding: EdgeInsets.only(right: 18.0, left: 20.0),
             trailing: Icon(Icons.archive_outlined,
                 color: Theme.of(context).accentColor),
             title: Text('Archive'),
             onTap: () {
-              Navigator.pushNamed(context, '/archive');
+              Navigator.of(context).push(routeArchive());
             },
           ),
           ListTile(
@@ -77,7 +80,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 color: Theme.of(context).accentColor),
             title: Text('Trash'),
             onTap: () {
-              Navigator.pushNamed(context, '/trash');
+              Navigator.of(context).push(routeTrash());
             },
           ),
           Divider(),

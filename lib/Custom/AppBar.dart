@@ -7,7 +7,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-        iconTheme: IconThemeData(color: Theme.of(context).backgroundColor, opacity: 0.7),
+        iconTheme: IconThemeData(
+            color: Theme.of(context).backgroundColor, opacity: 0.7),
         title: Text('TO DO',
             style: TextStyle(
                 color: Theme.of(context).primaryColor,
@@ -16,7 +17,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         elevation: 0,
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10))));
+                bottomLeft: Radius.circular(20),
+                bottomRight: Radius.circular(20))));
   }
 }
