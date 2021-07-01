@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:list_view/HomePage/ThemeData.dart';
-import 'package:list_view/HomePage/CustomAppBar.dart';
-
-bool darkMode = false;
+import 'package:list_view/Custom/AppBar.dart';
+import 'package:list_view/Custom/Drawer.dart';
+import 'package:list_view/globals.dart' as globals;
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -13,14 +11,9 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  List toDoList = [];
-  String _userToDo = '';
-  List<bool> _isVisible = [];
-  List<bool> _isDone = [];
-
   void confirmDelete(int index) {
     setState(() {
-      _isVisible[index] = false;
+      globals.isVisible[index] = false;
     });
     final snackBar = SnackBar(
         content: Text('Element is deleted'),
@@ -29,17 +22,18 @@ class _HomePageState extends State<HomePage> {
             textColor: Theme.of(context).accentColor,
             onPressed: () {
               setState(() {
-                _isVisible[index] = true;
+                globals.isVisible[index] = true;
               });
             }),
         duration: Duration(seconds: 2));
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
-    if (_isVisible[index] == false) toDoList.remove(index);
+    if (globals.isVisible[index] == false) globals.toDoList.remove(index);
   }
 
   Card createCard(int index) {
     return Card(
-      elevation: 0,
+      color: Theme.of(context).backgroundColor,
+      elevation: 2,
       shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
               topLeft: Radius.circular(10),
@@ -47,14 +41,14 @@ class _HomePageState extends State<HomePage> {
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10))),
       child: ListTile(
-        title: Text(toDoList[index]),
+        title: Text(globals.toDoList[index]),
         leading: IconButton(
-            icon: (_isDone[index] == false
+            icon: (globals.isDone[index] == false
                 ? Icon(Icons.check_box_outline_blank_outlined)
                 : Icon(Icons.check_box, color: Colors.green)),
             onPressed: () {
               setState(() {
-                _isDone[index] = !_isDone[index];
+                globals.isDone[index] = !globals.isDone[index];
               });
             }),
         trailing: IconButton(
@@ -74,9 +68,9 @@ class _HomePageState extends State<HomePage> {
         width: 20.0,
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [Icon(Icons.archive, color: Colors.black54, size: 30)]),
+          child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+            Icon(Icons.archive_outlined, color: Colors.black54, size: 25)
+          ]),
         ),
       ),
       secondaryBackground: Container(
@@ -85,15 +79,16 @@ class _HomePageState extends State<HomePage> {
         child: Padding(
           padding: const EdgeInsets.all(8.0),
           child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            Icon(Icons.delete_forever, color: Colors.black87, size: 30)
+            Icon(Icons.auto_delete_outlined, color: Colors.black54, size: 25)
           ]),
         ),
       ),
       movementDuration: const Duration(milliseconds: 500),
-      key: Key(toDoList[index]),
+      key: Key(globals.toDoList[index]),
       child: Column(
         children: [
-          Visibility(visible: _isVisible[index], child: createCard(index)),
+          Visibility(
+              visible: globals.isVisible[index], child: createCard(index)),
         ],
       ),
       confirmDismiss: (DismissDirection direction) async {
@@ -105,168 +100,120 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  void onPressedFloatingActionButton(BuildContext context) {
+    showGeneralDialog(
+        barrierColor: Colors.black.withOpacity(0.3),
+        transitionBuilder: (context, a1, a2, widget) {
+          return Transform.scale(
+            scale: a1.value,
+            child: Opacity(
+              opacity: a1.value,
+              child: AlertDialog(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(15.0))),
+                contentPadding: EdgeInsets.only(top: 10.0),
+                content: Container(
+                  width: 300.0,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 30.0, right: 30.0),
+                        child: TextField(
+                          autofocus: true,
+                          onChanged: (String value) {
+                            globals.userToDo = value;
+                          },
+                          decoration: InputDecoration(
+                            hintText: "Enter Something",
+                            border: InputBorder.none,
+                          ),
+                          maxLines: 3,
+                        ),
+                      ),
+                      InkWell(
+                        child: Container(
+                          padding: EdgeInsets.only(top: 20.0, bottom: 20.0),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).accentColor,
+                            borderRadius: BorderRadius.only(
+                                bottomLeft: Radius.circular(10.0),
+                                bottomRight: Radius.circular(10.0)),
+                          ),
+                          child: TextButton(
+                              style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Theme.of(context).accentColor)),
+                              onPressed: () {
+                                setState(() {
+                                  globals.toDoList.add(globals.userToDo);
+                                });
+                                globals.isVisible.add(true);
+                                globals.isDone.add(false);
+                                Navigator.of(context).pop();
+                                final snackBar = SnackBar(
+                                    content: Text('Element is created'),
+                                    duration: Duration(seconds: 2));
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBar);
+                              },
+                              child: Text(
+                                'ADD',
+                                style: TextStyle(
+                                    color: Theme.of(context).primaryColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15),
+                              )),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
+        transitionDuration: Duration(milliseconds: 200),
+        barrierDismissible: true,
+        barrierLabel: '',
+        context: context,
+        pageBuilder: (context, animation1, animation2) {
+          return Text('PAGE BUILDER');
+        });
+  }
+
   @override
   Widget build(BuildContext context) {
-    ThemeChanger _themeChanger = Provider.of<ThemeChanger>(context);
     return Scaffold(
       appBar: CustomAppBar(),
-      drawer: Drawer(
-        child: ListView(
-          children: <Widget>[
-            DrawerHeader(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('TO DO',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 20.0)),
-                    IconButton(
-                        onPressed: () {
-                          setState(() {
-                            darkMode = !darkMode;
-                            if (darkMode == false) {
-                              _themeChanger.setLightTheme();
-                            } else {
-                              _themeChanger.setDarkTheme();
-                            }
-                          });
-                        },
-                        icon: (darkMode == false
-                            ? Icon(Icons.dark_mode_outlined,
-                                color: Theme.of(context).accentColor)
-                            : Icon(Icons.light_mode_outlined,
-                                color: Theme.of(context).accentColor))),
-                  ],
-                ),
-                padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0)),
-            ListTile(
-              title: Text('First Menu Item'),
-              onTap: () {},
-            ),
-            ListTile(
-              title: Text('Second Menu Item'),
-              onTap: () {},
-            ),
-            Divider(),
-            ListTile(
-              title: Text('About'),
-              onTap: () {},
-            ),
-          ],
-        ),
-      ),
+      drawerEdgeDragWidth: 100.0,
+      drawer: CustomDrawer(),
       body: ListView.builder(
-        itemCount: toDoList.length,
+        itemCount: globals.toDoList.length,
         itemBuilder: (BuildContext context, int index) {
           return dismissibleCard(context, index);
         },
       ),
-      floatingActionButton: FloatingActionButton(
-          child: Container(
-            width: 60,
-            height: 60,
-            child: Icon(Icons.add, size: 30),
-            decoration: BoxDecoration(
-              color: Theme.of(context).accentColor,
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 5,
-                    blurRadius: 30,
-                    offset: Offset(0, 3))
-              ],
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: FloatingActionButton(
+            child: Container(
+              height: 75,
+              width: 75,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle, color: Theme.of(context).accentColor),
+              child: Icon(Icons.add,
+                  size: 40, color: Theme.of(context).backgroundColor),
             ),
-          ),
-          onPressed: () {
-            showGeneralDialog(
-                barrierColor: Colors.black.withOpacity(0.3),
-                transitionBuilder: (context, a1, a2, widget) {
-                  return Transform.scale(
-                    scale: a1.value,
-                    child: Opacity(
-                      opacity: a1.value,
-                      child: AlertDialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(15.0))),
-                        contentPadding: EdgeInsets.only(top: 10.0),
-                        content: Container(
-                          width: 300.0,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Padding(
-                                padding:
-                                    EdgeInsets.only(left: 30.0, right: 30.0),
-                                child: TextField(
-                                  autofocus: true,
-                                  onChanged: (String value) {
-                                    _userToDo = value;
-                                  },
-                                  decoration: InputDecoration(
-                                    hintText: "Enter Something",
-                                    border: InputBorder.none,
-                                  ),
-                                  maxLines: 3,
-                                ),
-                              ),
-                              InkWell(
-                                child: Container(
-                                  padding:
-                                      EdgeInsets.only(top: 20.0, bottom: 20.0),
-                                  decoration: BoxDecoration(
-                                    color: Theme.of(context).accentColor,
-                                    borderRadius: BorderRadius.only(
-                                        bottomLeft: Radius.circular(10.0),
-                                        bottomRight: Radius.circular(10.0)),
-                                  ),
-                                  child: TextButton(
-                                      style: ButtonStyle(
-                                          backgroundColor:
-                                              MaterialStateProperty.all(
-                                                  Theme.of(context)
-                                                      .accentColor)),
-                                      onPressed: () {
-                                        setState(() {
-                                          toDoList.add(_userToDo);
-                                        });
-                                        _isVisible.add(true);
-                                        _isDone.add(false);
-                                        Navigator.of(context).pop();
-                                        final snackBar = SnackBar(
-                                            content: Text('Element is created'),
-                                            duration: Duration(seconds: 2));
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(snackBar);
-                                      },
-                                      child: Text(
-                                        'ADD',
-                                        style: TextStyle(
-                                            color:
-                                                Theme.of(context).primaryColor,
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 15),
-                                      )),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                transitionDuration: Duration(milliseconds: 200),
-                barrierDismissible: true,
-                barrierLabel: '',
-                context: context,
-                pageBuilder: (context, animation1, animation2) {
-                  return Text('PAGE BUILDER');
-                });
-          }),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            onPressed: () {
+              onPressedFloatingActionButton(context);
+            }),
+      ),
     );
   }
 }
