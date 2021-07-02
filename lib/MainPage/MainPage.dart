@@ -10,11 +10,24 @@ class MainPage extends StatefulWidget {
   _MainPageState createState() => _MainPageState();
 }
 
-Route routeMainPage() {
+Route routeMainPageDrawer() {
   return PageRouteBuilder(
     pageBuilder: (context, animation, secondaryAnimation) => MainPage(),
     transitionsBuilder: (context, animation, secondaryAnimation, child) {
       var tween = Tween(begin: Offset(1.0, 0.0), end: Offset.zero);
+      var offsetAnimation = animation.drive(tween);
+      return SlideTransition(
+        position: offsetAnimation,
+        child: child,
+      );
+    },
+  );
+}
+Route routeMainPage() {
+  return PageRouteBuilder(
+    pageBuilder: (context, animation, secondaryAnimation) => MainPage(),
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      var tween = Tween(begin: Offset(-1.0, 0.0), end: Offset.zero);
       var offsetAnimation = animation.drive(tween);
       return SlideTransition(
         position: offsetAnimation,

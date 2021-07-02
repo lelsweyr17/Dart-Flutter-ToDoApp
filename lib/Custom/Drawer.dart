@@ -53,7 +53,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                 Icon(Icons.home_outlined, color: Theme.of(context).accentColor),
             title: Text('Main'),
             onTap: () {
-              Navigator.of(context).push(routeMainPage());
+              Navigator.of(context).push(routeMainPageDrawer());
             },
           ),
           ListTile(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:list_view/Custom/AppBar.dart';
 import 'package:list_view/Custom/Drawer.dart';
+import 'package:list_view/MainPage/MainPage.dart';
 import 'package:list_view/globals.dart' as globals;
 
 Route routeToDoPage() {
@@ -202,7 +202,20 @@ class _ToDoPageState extends State<ToDoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(),
+      appBar: AppBar(
+          leading: IconButton(
+              icon: Icon(Icons.keyboard_backspace_outlined),
+              onPressed: () {
+                Navigator.of(context).push(routeMainPage());
+              }),
+          iconTheme: IconThemeData(
+              color: Theme.of(context).backgroundColor, opacity: 0.7),
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20)))
+                  ),
       drawerEdgeDragWidth: 100.0,
       drawer: CustomDrawer(),
       body: ListView.builder(
